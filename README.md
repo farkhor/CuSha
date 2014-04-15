@@ -7,7 +7,6 @@ CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shar
 Requirements
 -----
  Cuda Compute Capability of your device has to be 2.0 or above.
- Warp size has to be 32.
  
  
 Future
