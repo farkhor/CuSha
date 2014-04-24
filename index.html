@@ -62,9 +62,8 @@
        To use CuSha, you need to first specify vertex content and edge content for the graph. 
        For CSR based processing methods, fill up <em>csr-UserStructures.cuh</em>, 
        and for G-Shards and CW fill up <em>cusha-UserStructures.cuh</em> For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
-        <pre><code> $ cd your_repo_root/repo_name
-                    $ git fetch origin
-                    $ git checkout gh-pages
+        <pre><code> typedef struct Vertex{ unsigned int distance; }Vertex;
+                    typedef struct Edge{ unsigned int weight; }Edge;    
         </code></pre>
      </p>
 
