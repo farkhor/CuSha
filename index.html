@@ -55,11 +55,17 @@
      <p>
        Now I assume your CUDA-enabled device meets the requirements and you want to use CuSha. 
        This section tells you how to define your algorithm in CuSha, compile them, and run them. 
-       <b>Please algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) is different from CuSha representations.</b>
+       <b>Please algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are different from CuSha representations.</b>
      </p>
      <h4>Algorithm Definition</h4>
      <p>
-       To use CuSha, you need to first specify what your 
+       To use CuSha, you need to first specify vertex content and edge content for the graph. 
+       For CSR based processing methods, fill up <em>csr-UserStructures.cuh</em>, 
+       and for G-Shards and CW fill up <em>cusha-UserStructures.cuh</em> For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
+        <pre><code> $ cd your_repo_root/repo_name
+                    $ git fetch origin
+                    $ git checkout gh-pages
+        </code></pre>
      </p>
 
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
