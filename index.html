@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1><a href="http://farkhor.github.io/CuSha/"><img src="images/CuSha-logo.png"></img></a></h1>
-        <p>CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shards and CW representation formats. </p>
+        <p>CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shards and CW representations.</p>
 
         <p class="view">View the Project on GitHub: <a href="https://github.com/farkhor/CuSha">farkhor/CuSha</a></p>
 
@@ -28,8 +28,30 @@
         </ul>
       </header>
       <section>
-        <h3>
-<a name="about-cusha" class="anchor" href="#about-cusha"><span class="octicon octicon-link"></span></a>About CuSha</h3>
+        
+    
+    <h3><a name="about-cusha" class="anchor" href="#about-cusha"><span class="octicon octicon-link"></span></a>About CuSha</h3>    
+      <p>
+        CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shards and Concatenated Windows (CW) representations to store graphs inside the GPU global memory. 
+        G-Shards and CW consume more space compared to Virtual Warp-Centric (VWC) method that uses Compressed Sparse Row (CSR) format but on the other hand provide better performance due to GPU-friednly representations. 
+        For completeness, provided package also includes VWC processing method for GPU and CPU. CPU implementation utilizes Pthreads.
+      </p>
+        
+    <h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>    
+      <p>
+        First of all, provided package, as it is, contains multiple ".cu" files. 
+        As a result, you will need CUDA 5.0 or higher to compile separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher. 
+        For more info, please have a look at <a href="http://on-demand.gputechconf.com/gtc-express/2012/presentations/gpu-object-linking.pdf">these slides</a>.    
+        For processing with both G-Shards and CW representations, I have used  <em>__syncthreads _or(int)</em> function, which is not supported in architectures before Fermi. 
+        Other than that, atomic operations require minimum CCs. 
+        Please refer to <a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/#atomic-functions">CUDA programming guide</a> for more info. 
+        CuSha is forward-compatible with warp sizes rather than 32.   
+        Provided VWC on GPU requires that physical warp size to be 32.   
+        VWC on CPU requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.   
+        This package is tested under Ubuntu 12.04. It wouldn't be hard to port it to other Operating Systems.
+      </p>    
+        
+
 
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
 
