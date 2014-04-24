@@ -34,7 +34,7 @@
       <p>
         CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shards and Concatenated Windows (CW) representations to store graphs inside the GPU global memory. 
         G-Shards and CW consume more space compared to Virtual Warp-Centric (VWC) method that uses Compressed Sparse Row (CSR) format but on the other hand provide better performance due to GPU-friednly representations. 
-        For completeness, provided package also includes VWC processing method for GPU and CPU. CPU implementation utilizes Pthreads.
+        For completeness, provided package also includes VWC processing method for GPU and a multi-threaded CPU implementation (that uses CSR as well). CPU implementation utilizes Pthreads.
       </p>
         
     <h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>    
@@ -47,7 +47,7 @@
         Please refer to <a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/#atomic-functions">CUDA programming guide</a> for more info. 
         </li><li>CuSha is forward-compatible with warp sizes rather than 32.   
         </li><li>Provided VWC on GPU requires physical warp size to be 32.   
-        </li><li>VWC on CPU requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.   
+        </li><li>Multi-threaded CPU program requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.   
         </li><li>This package is tested under <b>Ubuntu 12.04</b>. It wouldn't be hard to port it to other Operating Systems.
      </ul></p>    
         
