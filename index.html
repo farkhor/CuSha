@@ -146,6 +146,10 @@ Please note returned value will consequently signal the host to launch new GPU k
     Additinal inputs for edges like edge weight or initial vertex content can be supplied with more numbers in each row. 
     Examples can be found in provided templates.
     
+    <h3>Future for CuSha</h3>
+    CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, 
+    Maxwell architecture provides native shaed memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
+    
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/farkhor">farkhor</a>.</p>
