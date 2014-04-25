@@ -105,13 +105,17 @@ typedef struct Edge{ unsigned int weight; }Edge;
     The third step is to signal the caller function if the newly calculated vertex value is eligible to update the previosu value.
     <b>update_condition_CuSha</b> function does it by returning a boolean. This function for SSSP can be defined like below:
 <pre><code>__device__ bool update_condition_CuSha(	Vertex* local_V,	// newly calculated vertex content.
-								Vertex* V	) {	// Vertex content at the end of previous iteration.
+									Vertex* V	) {	// Vertex content at the end of previous iteration.
 	return ( local_V->distance < V->distance );
 }
 </code></pre>
 Please note returned value will consequently signal the host to launch new GPU kernels, so make sure your algorithm converges by <b>update_condition_CuSha</b> definition.
     </p>
-    
+    <p>
+    Beside above three functions there are two other user-specified functions in the same file that control initialization of the graph and how outputs should be.
+    <b>completeEntryCuSha</b> function is called during pre-processing for every edge and initalizes the edge content or source/destination vertex content appropriately. Examples can be found in templates.
+    <b>printVertexOutputCuSha</b> function is called after the processing has finished for every vertex to write the vertex content to the output file.
+    </p>
     <h4>Compile and Link</h4>
     <p>
       I have provided a very straight forward build bash script named <em>sfBuild.sh</em> that compiles files with required flags and links them and outputs the executable.
