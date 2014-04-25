@@ -48,10 +48,10 @@ CuSha: Vertex-Centric Graph Processing on GPUs,
     <h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>    
       <p><ul>
         <li>Provided package, as it is, contains multiple source files. 
-        As a result, you will need CUDA 5.0 or higher to compile separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher. 
+        As a result, you will need CUDA 5.0 or higher to compile them separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher. 
         For more info, please have a look at <a href="http://on-demand.gputechconf.com/gtc-express/2012/presentations/gpu-object-linking.pdf">these slides</a>.    
         </li><li>For processing with both G-Shards and CW representations, I have used  <em>__syncthreads _or(int)</em> function, which is not supported in architectures before Fermi. 
-        Other than that, atomic operations require minimum CCs. 
+        Furthermore, atomic operations require minimum CCs. 
         Please refer to <a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/#atomic-functions">CUDA programming guide</a> for more info. 
         </li><li>CuSha is forward-compatible with warp sizes rather than 32.   
         </li><li>Provided VWC on GPU requires physical warp size to be 32.   
@@ -94,9 +94,9 @@ typedef struct Edge{ unsigned int weight; }Edge;
     </p>
     
     <h4>Run</h4>
-    If you run the output executable from last step without any command-line input (or without required parameters), it prints out the usage to the system standard output. 
+    If you run the output executable from the last step without any command-line input (or without required parameters), it prints out the usage to the system standard output. 
     That's pretty much what I'm about to write here, except I don't bring it here anymore because you already know how to get what I was going to say ;) . 
-    One thing I have to mention is the input file to the executable. An input graph for CuSha (in form of a plain text file) contains edges.
+    One thing I have to explain a bit about is the input file to the executable. An input graph for CuSha (in form of a plain text file) contains edges.
     Each line in the input file corresponds to an edge in the graph and has at least two vertex indices separated by space or tab. 
     The first number specifies the vertex index the tail of the edge corresponds to and the second one shows the vertex index for the head. 
     This convention is found in many publicly available real-world graphs, such as <a href="http://snap.stanford.edu/data/">SNAP</a>'s. 
