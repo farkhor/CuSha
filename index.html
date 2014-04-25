@@ -99,7 +99,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
 		atomicMin ( &(local_V->distance), SrcV->distance + E->weight );
 }
 </code></pre>
-    One thing to note is that passed addresses are not valid to dereference if they are not already defined in structures.
+    One thing to note is that passed addresses must not be dereferenced if they are not already defined in structures.
     </p>
     <p>
     The third step is to signal the caller function if the newly calculated vertex value is eligible to update the previosu value.
@@ -115,6 +115,11 @@ Please note returned value will consequently signal the host to launch new GPU k
     Beside above three functions there are two other user-specified functions in the same file that control initialization of the graph and how outputs should be.
     <b>completeEntryCuSha</b> function is called during pre-processing for every edge and initalizes the edge content or source/destination vertex content appropriately. Examples can be found in templates.
     <b>printVertexOutputCuSha</b> function is called after the processing has finished for every vertex to write the vertex content to the output file.
+    </p>
+    <p> For CSR-based graph processing (using CPU or GPU), you need to modify the content of the file <em>csr-UserFunctions.cu</em>. 
+    Most of the functions look like what I already explained except that computation function in the second step is now replaced with two other functions. 
+    One is <b>compute_local</b> in which a thread calculates and nominates a new value for the vertex. Then in <b>compute_reduce</b> function, contents are compared two-by-two. 
+    This reduction happens for all the neighbors of a vertex, and the last selected nominee will be sent for update verification in <b>update_condition</b> function.
     </p>
     <h4>Compile and Link</h4>
     <p>
