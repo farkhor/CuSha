@@ -79,7 +79,16 @@ typedef struct Edge{ unsigned int weight; }Edge;
     </p>
     <p>You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
 
-    <p>The next step is to define required functions for CSR based processing and CuSha.</p>
+    <p>The next step is to define required functions for CSR-based processing and CuSha. First I explain about CuSha functions, and then about CSR ones. 
+    Functions you need to modify to process your graph with CuSha are all inside <em>cusha-UserFunctions.cu</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
+    The first fucntion that controls the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
+    The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
+<pre><code>__device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
+									Vertex* V	) {	// Address of the vertex in global memory
+					local_V->distance = V->distance;
+}
+</code></pre>    
+    </p>
     
     <h4>Compile and Link</h4>
     <p>
@@ -108,7 +117,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
     
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/farkhor">farkhor</a></p>
+        <p>This project is maintained by <a href="https://github.com/farkhor">farkhor</a>.</p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
