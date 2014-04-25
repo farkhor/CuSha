@@ -84,8 +84,8 @@ typedef struct Edge{ unsigned int weight; }Edge;
     The first fucntion that controls the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
 <pre><code>__device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
-									Vertex* V	) {	// Address of the vertex in global memory
-					local_V->distance = V->distance;
+								Vertex* V	) {	// Address of the vertex in global memory
+	local_V->distance = V->distance;
 }
 </code></pre>    
     </p>
