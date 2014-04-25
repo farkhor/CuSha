@@ -53,7 +53,7 @@ CuSha: Vertex-Centric Graph Processing on GPUs,
         </li><li>For processing with both G-Shards and CW representations, I have used  <em>__syncthreads _or(int)</em> function, which is not supported in architectures before Fermi. 
         Furthermore, atomic operations require minimum CCs. 
         Please refer to <a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/#atomic-functions">CUDA programming guide</a> for more info. 
-        </li><li>CuSha is forward-compatible with warp sizes rather than 32.   
+        </li><li>CuSha is forward-compatible with devices having a physical warp sizes rather than 32.   
         </li><li>Provided VWC on GPU requires physical warp size to be 32.   
         </li><li>Multi-threaded CPU program requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.   
         </li><li>This package is tested under <b>Ubuntu 12.04</b>. It wouldn't be hard to port it to other Operating Systems.
@@ -63,10 +63,11 @@ CuSha: Vertex-Centric Graph Processing on GPUs,
      <p>
        Now I assume your CUDA-enabled device meets the requirements and you want to use CuSha. 
        This section tells you how to define your algorithm in CuSha, compile them, and run them. 
-       <b>Please note algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are a bit different but completely independant from CuSha representations.</b>
-     </p>
+       </p>
      <h4>Algorithm Definition</h4>
      <p>
+       First of all, <b>Please note algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are a bit different but completely independant from CuSha representations.</b> 
+       
        To use CuSha, you need to first specify vertex content and edge content for the graph. 
        For CSR based processing methods, fill up <em>csr-UserStructures.cuh</em>, 
        and for G-Shards and CW fill up <em>cusha-UserStructures.cuh</em> For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
@@ -90,7 +91,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
     Then right click on the project on <em>Project Explorer</em>, select <em>import</em>-><em>General</em>-><em>File System</em>. 
     Then you have to specify the directory you have downloaded from this website and check <em>entryPoint.cu</em> plus all other 3 folders. 
     After you click on finish, you are ready to build the project for Debug and Release and tune project's settings easier. 
-    Most importantly, when you make a change to only a few source files, Nsight only compiles modifed files (simply because it takes care of created object files), and then links them. Hence you'll experience less waiting periods. 
+    Most importantly, when you make a change to only a few source files, Nsight only compiles modifed files (simply because it takes care of previously created object files), and then links them. Hence you'll experience less waiting periods. 
     </p>
     
     <h4>Run</h4>
