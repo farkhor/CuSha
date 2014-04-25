@@ -138,7 +138,7 @@ Please note returned value will consequently signal the host to launch new GPU k
     </p>
     
     <h4>Run</h4>
-    If you run the output executable from the last step without any command-line input (or without required parameters), it prints out the usage to the system standard output. 
+    <p>If you run the output executable from the last step without any command-line input (or without required parameters), it prints out the usage to the system standard output. 
     That's pretty much what I'm about to write here, except I don't bring it here anymore because you already know how to get what I was going to say ;) . 
     One thing I have to explain a bit about is the input file to the executable. An input graph for CuSha (in form of a plain text file) contains edges.
     Each line in the input file corresponds to an edge in the graph and has at least two vertex indices separated by space or tab. 
@@ -146,6 +146,7 @@ Please note returned value will consequently signal the host to launch new GPU k
     This convention is found in many publicly available real-world graphs, such as <a href="http://snap.stanford.edu/data/">SNAP</a>'s. 
     Additinal inputs for edges like edge weight or initial vertex content can be supplied with more numbers in each row. 
     Examples can be found in provided templates.
+    </p>
     
     <h3>Future for CuSha</h3>
     <p>CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, 
