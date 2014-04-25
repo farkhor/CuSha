@@ -69,7 +69,23 @@ typedef struct Edge{ unsigned int weight; }Edge;
     <p>You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
 
     <p>The next step is to define required functions for CSR based processing and CuSha.</p>
-
+    
+    <h4>Compile and Link</h4>
+    <p>
+      I have provided a very straight forward build bash script named <em>sfBuild.sh</em> that compiles files with required flags and links them and outputs the executable.
+      specified architecture (compute capability) in <em>sfBuild.sh</em> is 3.5. You will have to modify it according to your target device.
+    </p>
+    <p>
+    Provided build file does compilation for all the files every time you run it. As a result, it will take some time. 
+    If you are interested to play with the code, it is definitely better to use <b>Nsight Eclipse Edition</b> provided by Nividia. 
+    In order to do so, create an empty CUDA C/C++ project (with specified sm architecture and separate compilation). 
+    Then right click on the project on <em>Project Explorer</em>, select <em>import</em>-><em>General</em>-><em>File System</em>. 
+    Then you have to specify the directory you have downloaded from this website and check <em>entryPoint.cu<em> plus all other 3 folders. 
+    After you click on finish, you are ready to build the project for Debug and Release and tune project's settings easier. 
+    In addition, when you make a change to only a few source files, Nsight only compiles modifed files, and then links them. So you'll experience less waiting periods. 
+    </p>
+    
+    
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/farkhor">farkhor</a></p>
