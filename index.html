@@ -87,8 +87,12 @@ typedef struct Edge{ unsigned int weight; }Edge;
     
     <h4>Run</h4>
     If you run the output executable from last step without any command-line input (or without required parameters), it prints out the usage to the system standard output. 
-    That's pretty much what I'm about to write here, except I bring it here much shorter because you already know how to get what I'm about to say ;) . 
-    
+    That's pretty much what I'm about to write here, except I don't bring it here anymore because you already know how to get what I was going to say ;) . 
+    One thing I have to explain is the input file to the executable. An input graph for CuSha (in form of a plain text file) contains edges.
+    Each line in the input file corresponds to an edge in the graph and has at least two vertex indices separated by space or tab. 
+    The first number specifies the vertex index the tail of the edge corresponds to and the second one shows the vertex index for the head. 
+    Additinal inputs for edges like edge weight or initial vertex content can be supplied with more numbers in each row. 
+    Examples can be found via provided templates.
     
       </section>
       <footer>
