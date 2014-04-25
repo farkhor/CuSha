@@ -88,9 +88,10 @@ typedef struct Edge{ unsigned int weight; }Edge;
 	local_V->distance = V->distance;
 }
 </code></pre>
+</P>
+<P>
     In the next step, which happens in the function <b>compute_CuSha</b> every thread is assigned to process one edge. The operation done by the thread atomically updates the Vertex array in shared memory. 
     Below is <b>compute_CuSha</b> function for our SSSP. 
-    
 <pre><code>__device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
 							Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
 							Edge* E,	// Thread's specific shared memory.
@@ -147,8 +148,9 @@ Please note returned value will consequently signal the host to launch new GPU k
     Examples can be found in provided templates.
     
     <h3>Future for CuSha</h3>
-    CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, 
+    <p>CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, 
     Maxwell architecture provides native shaed memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
+    <\p>
     
       </section>
       <footer>
