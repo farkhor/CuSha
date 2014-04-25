@@ -89,7 +89,8 @@ typedef struct Edge{ unsigned int weight; }Edge;
 }
 </code></pre>
     In the next step, which happens in the function <b>compute_CuSha</b> every thread is assigned to process one edge. The operation done by the thread atomically updates the Vertex array in shared memory. 
-    Below is <b>compute_CuSha</b> function for our SSSP.
+    Below is <b>compute_CuSha</b> function for our SSSP. 
+    
 <pre><code>__device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
 						Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
 						Edge* E,	// Thread's specific shared memory.
