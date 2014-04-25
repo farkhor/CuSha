@@ -55,7 +55,7 @@
      <p>
        Now I assume your CUDA-enabled device meets the requirements and you want to use CuSha. 
        This section tells you how to define your algorithm in CuSha, compile them, and run them. 
-       <b>Please algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are different from CuSha representations.</b>
+       <b>Please note algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are different from CuSha representations.</b>
      </p>
      <h4>Algorithm Definition</h4>
      <p>
@@ -82,8 +82,12 @@ typedef struct Edge{ unsigned int weight; }Edge;
     Then right click on the project on <em>Project Explorer</em>, select <em>import</em>-><em>General</em>-><em>File System</em>. 
     Then you have to specify the directory you have downloaded from this website and check <em>entryPoint.cu</em> plus all other 3 folders. 
     After you click on finish, you are ready to build the project for Debug and Release and tune project's settings easier. 
-    In addition, when you make a change to only a few source files, Nsight only compiles modifed files, and then links them. So you'll experience less waiting periods. 
+    In addition, when you make a change to only a few source files, Nsight only compiles modifed files, and then links them. Hence you'll experience less waiting periods. 
     </p>
+    
+    <h4>Run</h4>
+    If you run the output executable from last step without any command-line input (or without required parameters), it prints out the usage to the system standard output. 
+    That's pretty much what I'm about to write here, except I bring it here much shorter because you already know how to get what I'm about to say ;) . 
     
     
       </section>
