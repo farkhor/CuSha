@@ -67,7 +67,9 @@ CuSha: Vertex-Centric Graph Processing on GPUs,
      <h4>Algorithm Definition</h4>
      <p>
        First of all, <b>Please note algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are a bit different but completely independant from CuSha representations.</b> 
-       
+       It means if you are defining your algorithm for CSR-based processing, processing procedure with CuSha representations stay unchanged (and also vice versa). 
+       </p>
+       <p>
        To use CuSha, you need to first specify vertex content and edge content for the graph. 
        For CSR based processing methods, fill up <em>csr-UserStructures.cuh</em>, 
        and for G-Shards and CW fill up <em>cusha-UserStructures.cuh</em> For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
