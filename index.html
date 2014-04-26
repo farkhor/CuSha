@@ -84,8 +84,8 @@ typedef struct Edge{ unsigned int weight; }Edge;
     The first fucntion controllong the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
 <pre><code>__device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
-								Vertex* V	) {	// Address of the vertex in global memory
-	local_V->distance = V->distance;
+	Vertex* V	) {	// Address of the vertex in global memory
+		local_V->distance = V->distance;
 }
 </code></pre>
 </P>
@@ -93,11 +93,11 @@ typedef struct Edge{ unsigned int weight; }Edge;
     In the next step, which happens in the function <b>compute_CuSha</b> every thread is assigned to process one edge. The operation done by the thread atomically updates the Vertex array in shared memory. 
     Below is <b>compute_CuSha</b> function for our SSSP. 
 <pre><code>__device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
-							Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
-							Edge* E,	// Thread's specific shared memory.
-							Vertex* local_V	) {	// Current value of the corresponding destination vertex.
-	if (SrcV->distance != CUSHA_SSSP_INF)	// Just to prevent possible unpredicted overflows.
-		atomicMin ( &(local_V->distance), SrcV->distance + E->weight );
+	Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
+	Edge* E,	// Thread's specific shared memory.
+	Vertex* local_V	) {	// Current value of the corresponding destination vertex.
+		if (SrcV->distance != CUSHA_SSSP_INF)	// Just to prevent possible unpredicted overflows.
+			atomicMin ( &(local_V->distance), SrcV->distance + E->weight );
 }
 </code></pre>
     One thing to note is that passed addresses must not be dereferenced if they are not already defined in structures.
@@ -106,8 +106,8 @@ typedef struct Edge{ unsigned int weight; }Edge;
     The third step is to signal the caller function if the newly calculated vertex value is eligible to update the previosu value.
     <b>update_condition_CuSha</b> function does it by returning a boolean. This function for SSSP can be defined like below:
 <pre><code>__device__ bool update_condition_CuSha(	Vertex* local_V,	// newly calculated vertex content.
-									Vertex* V	) {	// Vertex content at the end of previous iteration.
-	return ( local_V->distance < V->distance );
+	Vertex* V	) {	// Vertex content at the end of previous iteration.
+		return ( local_V->distance < V->distance );
 }
 </code></pre>
 Please note returned value will consequently signal the host to launch new GPU kernels, so make sure your algorithm converges by <b>update_condition_CuSha</b> definition.
