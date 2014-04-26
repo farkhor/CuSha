@@ -1,4 +1,4 @@
-#![alt text](http://farkhor.github.io/CuSha/images/CuSha-logo.png "CuSha")
+#![alt text](http://farkhor.github.io/CuSha/images/CuSha-logo-small.png "CuSha")
 
 CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shards and Concatenated Windows (CW) representations to store graphs inside the GPU global memory. G-Shards and CW consume more space compared to Compressed Sparse Row (CSR) format but on the other hand provide better performance due to GPU-friednly representations. For completeness, provided package also includes Virtual Warp-Centric (VWC) processing method for GPU and a multi-threaded CPU implementation, both using CSR representation.        
 We prepared a paper about CuSha that's accepted in [HPDC'14](http://www.hpdc.org/2014/) conference:    
