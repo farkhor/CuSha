@@ -11,9 +11,9 @@ We prepared a paper about CuSha that's accepted in [HPDC'14](http://www.hpdc.org
 
 ##Requirements
 
-Provided package, as it is, contains multiple source files. As a result, you will need CUDA 5.0 or higher to compile separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher. For a detailed explanation about requirements, please check out [CuSha page](http://farkhor.github.io/CuSha/).
+Provided package, as it is, contains multiple source files. As a result, you will need CUDA 5.0 or higher to compile separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher. For a detailed explanation about requirements, please check out [CuSha page](http://farkhor.github.io/CuSha#requirements).
 
  
 ##Usage
 
-For elaborated usage instructions, please have a look at  [CuSha page](http://farkhor.github.io/CuSha/).
+For elaborated usage instructions, please have a look at  [CuSha page](http://farkhor.github.io/CuSha#usage).
