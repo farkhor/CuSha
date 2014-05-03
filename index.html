@@ -48,15 +48,18 @@ CuSha: Vertex-Centric Graph Processing on GPUs,
     <h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>    
       <p><ul>
         <li>Provided package, as it is, contains multiple source files. 
-        As a result, you will need CUDA 5.0 or higher to compile them separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher. 
+        As a result, you will need CUDA 5.0 or higher to compile them separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher to run. 
         For more info, please have a look at <a href="http://on-demand.gputechconf.com/gtc-express/2012/presentations/gpu-object-linking.pdf">these slides</a>.    
         </li><li>For processing with both G-Shards and CW representations, I have used  <em>__syncthreads _or(int)</em> function, which is not supported in architectures before Fermi. 
         Furthermore, atomic operations require minimum CCs. 
         Please refer to <a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/#atomic-functions">CUDA programming guide</a> for more info. 
         </li><li>CuSha is forward-compatible with devices having a physical warp size rather than 32.   
         </li><li>Provided VWC on GPU requires physical warp size to be 32.   
-        </li><li>Multi-threaded CPU program requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.   
+        </li><li>Multi-threaded CPU program requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.  
+        </li><li>Although vertex indices are inherently abstract concepts, they're important in the input files. Be careful that if a graph only has one edge conencting vertex with index 27827 to vertex with index 26742, for example, in the eye of the provided package, it has up to 27827 vertices. Since I used unsigned integers to hold vertex indices, program's behavior when faced with greater than values unsigned int can hold are undefined.
         </li><li>This package is tested under <b>Ubuntu 12.04</b>. It wouldn't be hard to port it to other Operating Systems.
+     </li>
+     	
      </ul></p>    
         
     <h3><a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>    
