@@ -56,7 +56,6 @@ CuSha: Vertex-Centric Graph Processing on GPUs,
         </li><li>CuSha is forward-compatible with devices having a physical warp size rather than 32.   
         </li><li>Provided VWC on GPU requires physical warp size to be 32.   
         </li><li>Multi-threaded CPU program requires <em>NVCC</em> to be compiled although with small modifications it can be a pure C/C++ piece of code.  
-        </li><li>Although vertex indices are inherently abstract concepts, they're important in the input files. Be careful that if a graph only has one edge connecting the vertex with index 27827 to the vertex with index 26742, for example, in the eye of the provided package, it has up to 27827 vertices. Since I used unsigned integer type to hold vertex indices, program's behavior when faced with indices greater than the amount an unsigned int can hold is undefined.
         </li><li>This package is tested under <b>Ubuntu 12.04</b>. It wouldn't be hard to port it to other Operating Systems.
      </li>
      	
@@ -149,6 +148,9 @@ Please note returned value will consequently signal the host to launch new GPU k
     This convention is found in many publicly available real-world graphs, such as <a href="http://snap.stanford.edu/data/">SNAP</a>'s. 
     Additinal inputs for edges like edge weight or initial vertex content can be supplied with more numbers in each row. 
     Examples can be found in provided templates.
+    </p>
+    <p>
+    	One last note about input files. Although vertex indices are inherently abstract concepts, they're important in the input files. Be careful that if a graph only has one edge connecting the vertex with index 27827 to the vertex with index 26742, for example, in the eye of the provided package, it has up to 27827 vertices. Plus since I used unsigned integer type to hold vertex indices, program's behavior when faced with indices greater than the amount an unsigned int can hold is undefined.
     </p>
     
     <h3>Future for CuSha</h3>
