@@ -13,7 +13,7 @@
 #define PHYSICAL_WARP_SIZE 32
 #define COMPILE_TIME_DEFINED_BLOCK_SIZE 256
 
-// Below function provides you with the mask of virtual warp so you can avoid probably costly division or modulo operations.
+// Below function provides you with the shifts needed by virtual warp so you can avoid probably costly division operations.
 __host__ __device__ __inline__ uint VirtualWarpMask ( const uint VWSize ) {
 	switch(VWSize){
 		case 16:
