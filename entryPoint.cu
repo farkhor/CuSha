@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 	Additional arguments:\n\
 		-Output file (default: out.txt). E.g., --output myout.txt.\n\
 		-Device ID (default: 0). E.g., --device 1\n\
-		-GPU kernels for Block size for CW and GS (default: chosen based on analysis). E.g., --bsize 512.\n\
+		-GPU kernels Block size for CW and GS (default: chosen based on analysis). E.g., --bsize 512.\n\
 		-Virtual warp size for VWC (default: 32). E.g., --vwsize 8.\n\
 		-Number of threads for MTCPU (default: 1). E.g., --threads 4.\n\
 		-User's arbitrary parameter (default: 0). E.g., --arbparam 17.\n";
