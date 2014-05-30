@@ -1,7 +1,6 @@
 /*
  * Created by Farzad Khorasani.
- * 	Email: fkhor001@cs.ucr.edu
- * 	Webpage: http://www.cs.ucr.edu/~fkhor001
+ * Email: fkhor001@cs.ucr.edu
  */
 
 #include <stdlib.h>
