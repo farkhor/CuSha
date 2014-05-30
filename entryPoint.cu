@@ -1,7 +1,4 @@
 /*
- * Free to use or modification (without any guarantee). Please download paper citation from:
- *	http://farkhor.github.io/CuSha
- *
  * Created by Farzad Khorasani.
  * 	Email: fkhor001@cs.ucr.edu
  * 	Webpage: http://www.cs.ucr.edu/~fkhor001
