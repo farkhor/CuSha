@@ -34,20 +34,22 @@ typedef struct Vertex{
 
 // Vertex_static structure. Those properties of the vertex that remain constant during processing should be declared here.
 typedef struct Vertex_static{
-	char dummy[];	// Dummy flexible array. It is useful when the structure is empty. Don't delete.
 
 #ifdef CUSHA_PR
 	unsigned int NbrsNum;
+#else
+	char dummy[];	// Dummy flexible array. It is useful when the structure is empty. Don't delete.
 #endif
 
 }Vertex_static;
 
 // Edge structure.
 typedef struct Edge{
-	char dummy[];	// Dummy flexible array. It is useful when the structure is empty. Don't delete.
 
 #ifdef CUSHA_SSSP
 	unsigned int weight;
+#else
+	char dummy[];	// Dummy flexible array. It is useful when the structure is empty. Don't delete.
 #endif
 
 }Edge;
