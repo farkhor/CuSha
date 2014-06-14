@@ -110,9 +110,9 @@ __device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the correspon
 // This function is executed for every edge in the shard.
 // Since multiple threads may access same shared memory address at the same time, it (usually) has to be implemented with atomics.
 __device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
-								Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
-								Edge* E,	// Thread's specific shared memory.
-								Vertex* local_V	) {	// Current value of the corresponding (destination) vertex.
+								Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes run-time error.
+								Edge* E,	// Edge content for the entry. Dereferencing this pointer if it's not defined creates run-time error.
+								Vertex* local_V	) {	// Current value of the corresponding (destination) vertex in the shared memory.
 
 #ifdef CUSHA_BFS
 	if (SrcV->distance != CUSHA_BFS_INF)	// Just to prevent possible unpredicted overflows.
