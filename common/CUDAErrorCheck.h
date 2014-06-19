@@ -1,6 +1,8 @@
 #ifndef	_CUDAERRCHCK_H
 #define	_CUDAERRCHCK_H
 
+#include <stdio.h>
+
 //Error checking mechanism
 #define CUDAErrorCheck(err) { CUDAAssert((err), __FILE__, __LINE__); }
 inline void CUDAAssert( cudaError_t err, char *file, int line, bool abort=true )
