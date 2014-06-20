@@ -153,10 +153,17 @@ Please note returned value will consequently signal the host to launch new GPU k
     	One last note about input files. Although vertex indices are inherently abstract concepts, they're important in the input files. Be careful that if a graph only has one edge connecting the vertex with index 27827 to the vertex with index 26742, for example, in the eye of the provided package, it has up to 27827 vertices. Plus since I used unsigned integer type to hold vertex indices, program's behavior when faced with indices greater than the amount an unsigned int can hold is undefined.
     </p>
     
-    <h3>Future for CuSha</h3>
-    <p>CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, 
-    Maxwell architecture provides native shared memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
-    </p>
+    <h3>Things to note</h3>
+    <p><ul>
+    	<li>
+    	CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, Maxwell architecture provides native shared memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
+    	</li>
+    	<li>
+    	As explained <a href="http://devblogs.nvidia.com/parallelforall/separate-compilation-linking-cuda-device-code/">here</a>, 
+    	when the caller function cannot see the callee device function, it may prevent the compiler to perform some optimizations on the callee. 
+    	If you modify the provided code so that all the pieces of GPU code are visible to one another at compile time, you may gain some speed-up.
+    	</li>
+    </ul></p>
     
       </section>
       <footer>
