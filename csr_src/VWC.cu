@@ -14,6 +14,7 @@
 #define COMPILE_TIME_DEFINED_BLOCK_SIZE 256
 
 // Virtual Warp-Centric (VWC) manner of processing graph using Compressed Sparse Row (CSR) representation format.
+// One can use shuffle instructions to implement this kernel. I used shared memory for data exchange between threads.
 template < uint VWSize, uint VWMask >
 __global__ void VWC_CSR_GPU_kernel(	const uint num_of_vertices,
 									const uint* vertices_indices,
@@ -32,78 +33,63 @@ __global__ void VWC_CSR_GPU_kernel(	const uint num_of_vertices,
 	// You might gain some performance if you limit maximum number of registers per thread with -maxrregcount flag. For example, specifying 32 for the Kepler architecture.
 	const uint warp_in_block_offset = threadIdx.x >> VWMask;
 	const uint VLane_id = threadIdx.x & (VWSize-1);
-	uint t_id = threadIdx.x + blockIdx.x * blockDim.x;
-	uint VW_id = t_id >> VWMask;
+	const uint t_id = threadIdx.x + blockIdx.x * blockDim.x;
+	const uint VW_id = t_id >> VWMask;
+	if ( VW_id >= num_of_vertices )
+		return;
 
-	while( VW_id < num_of_vertices ) {
+	previous_vertex_value = VertexValue[VW_id];
+	// Only one virtual lane in the virtual warp does vertex initialization.
+	if ( VLane_id == 0 ) {
+		edges_starting_address [ warp_in_block_offset ] = vertices_indices [ VW_id ];
+		ngbrs_size [ warp_in_block_offset ] = vertices_indices [ VW_id + 1 ] - edges_starting_address [ warp_in_block_offset ] ;
+		init_compute( final_vertex_values + warp_in_block_offset, &previous_vertex_value );
+	}
 
-		previous_vertex_value = VertexValue[VW_id];
-		// Only one virtual lane in the virtual warp does vertex initialization.
-		if ( VLane_id == 0 ) {
-			edges_starting_address [ warp_in_block_offset ] = vertices_indices [ VW_id ];
-			ngbrs_size [ warp_in_block_offset ] = vertices_indices [ VW_id + 1 ] - edges_starting_address [ warp_in_block_offset ] ;
-			init_compute( final_vertex_values + warp_in_block_offset, &previous_vertex_value );
-		}
+	for ( uint index = VLane_id; index < ngbrs_size[ warp_in_block_offset ]; index += VWSize ) {
 
-		for ( uint index = VLane_id; index < ngbrs_size[ warp_in_block_offset ]; index += VWSize ) {
+		uint target_edge = edges_starting_address[ warp_in_block_offset ] + index;
+		uint target_vertex = edges_indices [ target_edge ];
+		compute_local ( 	VertexValue + target_vertex,
+							VertexValue_static + target_vertex,
+							EdgeValue + target_edge,
+							thread_outcome + threadIdx.x,
+							&previous_vertex_value );
 
-			uint target_edge = edges_starting_address[ warp_in_block_offset ] + index;
-			uint target_vertex = edges_indices [ target_edge ];
-			compute_local ( 	VertexValue + target_vertex,
-								VertexValue_static + target_vertex,
-								EdgeValue + target_edge,
-								thread_outcome + threadIdx.x,
-								&previous_vertex_value );
-
-			// Parallel Reduction.
-			if ( VWSize == 32 )
-				if( VLane_id < 16 )
-					if ( (index + 16) < ngbrs_size[ warp_in_block_offset ])
-						compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 16 );
-			if ( VWSize >= 16 )
-				if( VLane_id < 8 )
-					if ( (index + 8) < ngbrs_size[ warp_in_block_offset ])
-						compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 8 );
-			if ( VWSize >= 8 )
-				if( VLane_id < 4 )
-					if ( (index + 4) < ngbrs_size[ warp_in_block_offset ])
-						compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 4 );
-			if ( VWSize >= 4 )
-				if( VLane_id < 2 )
-					if ( (index + 2) < ngbrs_size[ warp_in_block_offset ])
-						compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 2 );
-			if ( VWSize >= 2 )
-				if( VLane_id < 1 ) {
-					if ( (index + 1) < ngbrs_size[ warp_in_block_offset ])
-						compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 1 );
-					compute_reduce ( final_vertex_values + warp_in_block_offset, thread_outcome + threadIdx.x );	//	Virtual lane 0 saves the final value of current iteration.
-				}
-
-		}
-
-		if ( VLane_id == 0 )
-			if ( update_condition ( final_vertex_values + warp_in_block_offset, &previous_vertex_value  ) ) {
-				(*dev_finished) = JOB_NOT_FINISHED_YET;
-				VertexValue [ VW_id ] = (Vertex) (final_vertex_values [ warp_in_block_offset ]);
+		// Parallel Reduction.
+		if ( VWSize == 32 )
+			if( VLane_id < 16 )
+				if ( (index + 16) < ngbrs_size[ warp_in_block_offset ])
+					compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 16 );
+		if ( VWSize >= 16 )
+			if( VLane_id < 8 )
+				if ( (index + 8) < ngbrs_size[ warp_in_block_offset ])
+					compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 8 );
+		if ( VWSize >= 8 )
+			if( VLane_id < 4 )
+				if ( (index + 4) < ngbrs_size[ warp_in_block_offset ])
+					compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 4 );
+		if ( VWSize >= 4 )
+			if( VLane_id < 2 )
+				if ( (index + 2) < ngbrs_size[ warp_in_block_offset ])
+					compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 2 );
+		if ( VWSize >= 2 )
+			if( VLane_id < 1 ) {
+				if ( (index + 1) < ngbrs_size[ warp_in_block_offset ])
+					compute_reduce ( thread_outcome + threadIdx.x, thread_outcome + threadIdx.x + 1 );
+				compute_reduce ( final_vertex_values + warp_in_block_offset, thread_outcome + threadIdx.x );	//	Virtual lane 0 saves the final value of current iteration.
 			}
-
-		t_id +=  blockDim.x * gridDim.x;
-		VW_id = t_id >> VWMask;
 
 	}
 
+	if ( VLane_id == 0 )
+		if ( update_condition ( final_vertex_values + warp_in_block_offset, &previous_vertex_value  ) ) {
+			(*dev_finished) = JOB_NOT_FINISHED_YET;
+			VertexValue [ VW_id ] = (Vertex) (final_vertex_values [ warp_in_block_offset ]);
+		}
+
 }
 
-unsigned int calculateRequiredSharedMemoryInBytes(	const unsigned int AVertexSizeAligned,
-													const dim3 blockDim,
-													const unsigned int VirtualWarpSize	) {
-	unsigned int total = /*AVertexSizeAligned*/ sizeof(Vertex) * (blockDim.x+2*(blockDim.x/VirtualWarpSize));	//for Vertex
-	//alignment requirement for external shared memory integers usually satisfies in above total.
-	//if ( total % sizeof(uint) != 0 )
-	//	total = ((total/sizeof(uint)) + 1) * sizeof(uint);
-	total += sizeof(uint) * (2*(blockDim.x/VirtualWarpSize));
-	return total;
-}
 
 bool processGraphVWC(	CSRGraph* hostGraph,
 						const uint VirtualWarpSize ) {
@@ -119,8 +105,12 @@ bool processGraphVWC(	CSRGraph* hostGraph,
 
 	dim3 blockDim( COMPILE_TIME_DEFINED_BLOCK_SIZE, 1, 1 );
 
+	/*
 	// Occupying all SMs with (constant) maximum number of threads to eliminate new block scheduling overhead.
 	dim3 gridDim( (deviceProp.multiProcessorCount*deviceProp.maxThreadsPerMultiProcessor)/blockDim.x, 1, 1);
+	 */
+
+	dim3 gridDim( ceil(((double)hostGraph->num_of_vertices)/(COMPILE_TIME_DEFINED_BLOCK_SIZE/VirtualWarpSize)), 1, 1 );
 
 	// Host and device flags indicating if the processing is finished.
 	int finished;
@@ -150,9 +140,6 @@ bool processGraphVWC(	CSRGraph* hostGraph,
 
 	H2D_copy_time = getTime();
 	fprintf( stdout, "Copying the graph from the host to the device finished in: %f (ms)\n", H2D_copy_time );
-
-	//unsigned int AVertexSizeAligned = pow(2, ceil(log(sizeof(Vertex))/log(2)));	// Alignment for external shared memory usage.
-	//const unsigned int requiredSharedMem = calculateRequiredSharedMemoryInBytes(AVertexSizeAligned, blockDim,VirtualWarpSize);
 
 	// Iteratively process the graph on the device.
 	fprintf( stdout, "Processing graph in a virtual warp-centric manner using CSR representation ...\n" );
