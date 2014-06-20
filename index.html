@@ -159,6 +159,9 @@ Please note returned value will consequently signal the host to launch new GPU k
     	CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, Maxwell architecture provides native shared memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
     	</li>
     	<li>
+    	We have not taken into account memory allocations in CPU and GPU copying/processing methods time measurements. 
+    	</li>
+    	<li>
     	As explained <a href="http://devblogs.nvidia.com/parallelforall/separate-compilation-linking-cuda-device-code/">here</a>, 
     	when the caller function cannot see the callee device function, the compiler may not be able to perform some optimizations on the callee, adhering to an ABI.
     	If you modify the provided code so that all the pieces of GPU code are visible to one another at compile time, you may gain some speed-up.
