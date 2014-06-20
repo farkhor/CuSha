@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "csr-UserStructures.h"
 
+
 /**************************************
  *  INITIALIZING FUNCTIONS
  **************************************/
@@ -90,8 +91,8 @@ void printVertexOutput(	const int vertexIndex,
 
 // At every iteration, you need to initialize shared memory with vertices.
 // This function is executed for each and every vertex.
-__device__ __host__ void init_compute (	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
-										Vertex* V	) {	// Address of the vertex in global memory
+__device__ __host__ void init_compute (	volatile Vertex* local_V,	// Address of the corresponding vertex in shared memory.
+		Vertex* V	) {	// Address of the previous version of the vertex in shared memory.
 
 #ifdef VWC_BFS
 	local_V->distance = V->distance;
@@ -112,7 +113,7 @@ __device__ __host__ void init_compute (	Vertex* local_V,	// Address of the corre
 __device__ __host__ void compute_local (	Vertex* SrcV,	// Source vertex in global memory.
 											Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
 											Edge* E,	// Edge in global memory. Dereferencing this pointer if it's not defined cause error.
-											Vertex* thread_V_in_shared,	// Thread's specific shared memory.
+											volatile Vertex* thread_V_in_shared,	// Thread's specific shared memory.
 											Vertex* preV	) {	// Value of the corresponding (destination) vertex initialized at the previous step.
 
 #ifdef VWC_BFS
@@ -132,8 +133,8 @@ __device__ __host__ void compute_local (	Vertex* SrcV,	// Source vertex in globa
 }
 
 // Reduction function that is performed for every pair of neighbors of a vertex.
-__device__ __host__ void compute_reduce (	Vertex* thread_V_in_shared,
-											Vertex* next_thread_V_in_shared	) {
+__device__ __host__ void compute_reduce (	volatile Vertex* thread_V_in_shared,
+		volatile Vertex* next_thread_V_in_shared	) {
 
 #ifdef VWC_BFS
 	if ( thread_V_in_shared->distance > next_thread_V_in_shared->distance )
@@ -153,8 +154,8 @@ __device__ __host__ void compute_reduce (	Vertex* thread_V_in_shared,
 
 // Below function signals the caller (and consequently the host) if the vertex content should be replaced with the newly calculated value.
 // This function is performed by one virtual lane in the virtual warp.
-__device__ __host__ bool update_condition (	Vertex* computed_V,
-											Vertex* previous_V	) {
+__device__ __host__ bool update_condition (	volatile Vertex* computed_V,
+		Vertex* previous_V	) {
 
 #ifdef VWC_BFS
 	return ( computed_V->distance < previous_V->distance );

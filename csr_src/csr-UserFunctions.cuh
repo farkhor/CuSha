@@ -18,20 +18,20 @@ void printVertexOutput(	const int vertexIndex,
 						const Vertex resultVertex,
 						FILE* outFile	);
 
-__device__ __host__ void init_compute(	Vertex* local_V,
-										Vertex* V_dynamic	);
+__device__ __host__ void init_compute(	volatile Vertex* local_V,
+		Vertex* V	);
 
 __device__ __host__ void compute_local(	Vertex* SrcV,
 										Vertex_static* SrcV_static,
 										Edge* E,
-										Vertex* local_V,
+										volatile Vertex* local_V,
 										Vertex* preV	);
 
-__device__ __host__ void compute_reduce(	Vertex* local_V,
-											Vertex* local_V_next	);
+__device__ __host__ void compute_reduce(	volatile Vertex* local_V,
+		volatile Vertex* local_V_next	);
 
-__device__ __host__ bool update_condition(	Vertex* local_V,
-											Vertex* V	);
+__device__ __host__ bool update_condition(	volatile Vertex* local_V,
+		Vertex* V	);
 
 
 #endif
