@@ -56,7 +56,7 @@ __global__ void VWC_CSR_GPU_kernel(	const uint num_of_vertices,
 							thread_outcome + threadIdx.x,
 							&previous_vertex_value );
 
-		// Parallel Reduction.
+		// Parallel Reduction. Totally unrolled.
 		if ( VWSize == 32 )
 			if( VLane_id < 16 )
 				if ( (index + 16) < ngbrs_size[ warp_in_block_offset ])
