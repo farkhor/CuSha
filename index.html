@@ -144,7 +144,10 @@ Please note returned value will consequently signal the host to launch new GPU k
     Examples can be found in provided templates.
     </p>
     <p>
-    	One last note about input files. Although vertex indices are inherently abstract concepts, they're important in the input files. Be careful that if a graph only has one edge connecting the vertex with index 27827 to the vertex with index 26742, for example, in the eye of the provided package, it has up to 27827 vertices. Plus since I used unsigned integer type to hold vertex indices, program's behavior when faced with indices greater than the amount an unsigned int can hold is undefined.
+    	One last note about input files. Although vertex indices are inherently abstract concepts, they're important in the input files. Be careful that if a graph only has one edge connecting the vertex with index 27827 to the vertex with index 26742, for example, in the eye of the provided package, it has up to 27827 vertices. Plus since I used unsigned integer type to hold vertex indices, program's behavior when faced with indices greater than the amount an unsigned int can hold is undefined. 
+    </p>
+    <p>
+    	If a graph has large vertex indices (for example <a href="https://snap.stanford.edu/data/cit-HepPh.html">this one</a>) and CuSha fails to come up with a proper block size on its own, you can use <a href="https://github.com/farkhor/Graph-Edge-List-Vertex-Index-Minimizer">this program</a> to minimize the indices, without changing the graph structure.
     </p>
     
     <h3>Things to note</h3>
