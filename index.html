@@ -80,7 +80,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
     Functions you need to modify to process your graph with CuSha are all inside <em>cusha-UserFunctions.cuh</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
     The first fucntion controllong the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
-<pre><code>__device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
+<pre><code>inline __device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
 	Vertex* V	) {	// Address of the vertex in global memory
 		local_V->distance = V->distance;
 }
@@ -89,7 +89,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
 <P>
     In the next step, which happens in the function <b>compute_CuSha</b> every thread is assigned to process one edge. The operation done by the thread atomically updates the Vertex array in shared memory. 
     Below is <b>compute_CuSha</b> function for our SSSP. 
-<pre><code>__device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
+<pre><code>inline __device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
 	Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
 	Edge* E,	// Thread's specific shared memory.
 	Vertex* local_V	) {	// Current value of the corresponding destination vertex.
@@ -102,7 +102,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
     <p>
     The third step is to signal the caller function if the newly calculated vertex value is eligible to update the previosu value.
     <b>update_condition_CuSha</b> function does it by returning a boolean. This function for SSSP can be defined like below:
-<pre><code>__device__ bool update_condition_CuSha(	Vertex* local_V,	// newly calculated vertex content.
+<pre><code>inline __device__ bool update_condition_CuSha(	Vertex* local_V,	// newly calculated vertex content.
 	Vertex* V	) {	// Vertex content at the end of previous iteration.
 		return ( local_V->distance < V->distance );
 }
