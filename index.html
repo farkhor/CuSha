@@ -77,7 +77,7 @@ typedef struct Edge{ unsigned int weight; }Edge;
     <p>You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
 
     <p>The next step is to define required functions for CSR-based processing and CuSha. First I explain about CuSha functions, and then about CSR ones. 
-    Functions you need to modify to process your graph with CuSha are all inside <em>cusha-UserFunctions.cu</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
+    Functions you need to modify to process your graph with CuSha are all inside <em>cusha-UserFunctions.cuh</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
     The first fucntion controllong the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
 <pre><code>__device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
@@ -114,7 +114,7 @@ Please note returned value will consequently signal the host to launch new GPU k
     <b>completeEntryCuSha</b> function is called during pre-processing for every edge and initalizes the edge content or source/destination vertex content appropriately. Examples can be found in templates.
     <b>printVertexOutputCuSha</b> function is called after the processing has finished for every vertex to write the vertex content to the output file.
     </p>
-    <p> For CSR-based graph processing (using VWC or MTCPU methods), you need to modify the content of the file <em>csr-UserFunctions.cu</em>. 
+    <p> For CSR-based graph processing (using VWC or MTCPU methods), you need to modify the content of the file <em>csr-UserFunctions.cuh</em>. 
     Most of the functions are similar to what I already explained except that computation function in the second step is now replaced with two other functions. 
     One is <b>compute_local</b> in which a thread calculates and nominates a new value for the vertex. Then in <b>compute_reduce</b> function, contents are compared two-by-two. 
     This reduction happens for all the neighbors of a vertex, and the last selected nominee will be sent for update verification in <b>update_condition</b> function.
@@ -157,11 +157,6 @@ Please note returned value will consequently signal the host to launch new GPU k
     	</li>
     	<li>
     	We have not taken into account memory allocations in time measurements for CPU and GPU copying/processing methods.
-    	</li>
-    	<li>
-    	As explained <a href="http://devblogs.nvidia.com/parallelforall/separate-compilation-linking-cuda-device-code/">here</a>, 
-    	when the caller function cannot see the callee device function, the compiler may not be able to perform some optimizations on the callee, adhering to an ABI.
-    	If you modify the provided code so that all the pieces of GPU code are visible to one another at compile time, you may gain some speed-up.
     	</li>
     </ul></p>
     
