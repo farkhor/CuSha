@@ -127,7 +127,7 @@ bool processGraphCW(	CWGraph* Host_Graph,
 	if(sizeof(Edge)>0) CUDAErrorCheck ( cudaMalloc( (void**)&dev_EdgeValue, Host_Graph->num_of_edges * sizeof(Edge) ) );
 	if(sizeof(Vertex_static)>0) CUDAErrorCheck ( cudaMalloc( (void**)&dev_SrcValue_static, Host_Graph->num_of_edges * sizeof(Vertex_static) ) );
 	CUDAErrorCheck ( cudaMalloc( (void**)&dev_shard_concatenated_windows_sizes, ( Host_Graph->num_of_edges + 1 )* sizeof(unsigned int) ) );
-	CUDAErrorCheck ( cudaMalloc( (void**)&dev_shard_sizes, ( Host_Graph->num_of_edges + 1 )* sizeof(unsigned int) ) );
+	CUDAErrorCheck ( cudaMalloc( (void**)&dev_shard_sizes, ( Host_Graph->num_of_shards + 1 )* sizeof(unsigned int) ) );
 
 	// Copy the graph from the host to the device.
 	// Use asynchronous copies to avoid unnecessary synchronization with the host for each and every copy.
