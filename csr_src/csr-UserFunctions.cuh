@@ -129,8 +129,7 @@ inline __device__ __host__ void compute_local (	Vertex* SrcV,	// Source vertex i
 
 #ifdef VWC_PR
 	unsigned int nbrsNum = SrcV_static->NbrsNum;
-	if ( nbrsNum != 0 )
-		thread_V_in_shared->rank = SrcV->rank / nbrsNum;
+	thread_V_in_shared->rank = ( nbrsNum != 0 ) ? ( SrcV->rank / nbrsNum ) : 0;
 #endif
 
 }
