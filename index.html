@@ -86,7 +86,7 @@ struct Edge{ unsigned int weight; };
     Below is <b>compute_CuSha</b> function for our SSSP. 
 <pre><code>inline __device__ void compute_CuSha(	Vertex SrcV,	// Source vertex.
 	Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
-	Edge* E,	// Thread's specific shared memory.
+	Edge* E,	// Connected Edge value. Dereferencing this pointer if it's not defined causes error.
 	Vertex* local_V	) {	// Current value of the corresponding destination vertex in the shared memory.
 		if (SrcV.distance != CUSHA_SSSP_INF)	// Just to prevent possible unpredicted overflows.
 			atomicMin ( &(local_V->distance), SrcV.distance + E->weight );
