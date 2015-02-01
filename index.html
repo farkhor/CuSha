@@ -42,10 +42,7 @@
         
     <h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>    
       <p><ul>
-        <li>Provided package, as it is, contains multiple source files. 
-        As a result, you will need CUDA 5.0 or higher to compile them separately and link, alongside a CUDA-enabled device with Compute Capability (CC) 2.0 or higher to run. 
-        For more info, please have a look at <a href="http://on-demand.gputechconf.com/gtc-express/2012/presentations/gpu-object-linking.pdf">these slides</a>.    
-        </li><li>For processing with both G-Shards and CW representations, I have used  <em>__syncthreads _or(int)</em> function, which is not supported in architectures before Fermi. 
+        <li>For processing with both G-Shards and CW representations, I have used  <em>__syncthreads _or(int)</em> function, which is not supported in architectures before Fermi. 
         Furthermore, atomic operations require minimum CCs. 
         Please refer to <a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/#atomic-functions">CUDA programming guide</a> for more info. 
         </li><li>CuSha is forward-compatible with devices having a physical warp size rather than 32.   
@@ -67,17 +64,15 @@
        It means if you are defining your algorithm for CSR-based processing, processing procedure with CuSha representations stay unchanged (and also vice versa). 
        </p>
        <p>
-       To use CuSha, you need to first specify vertex content and edge content for the graph. 
-       For CSR based processing methods, fill up <em>csr-UserStructures.cuh</em>, 
-       and for G-Shards and CW fill up <em>cusha-UserStructures.cuh</em> For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
-<pre><code>typedef struct Vertex{ unsigned int distance; }Vertex;
-typedef struct Edge{ unsigned int weight; }Edge;    
+       To use CuSha, before defining required functions, you need to first specify vertex content and edge content for the graph inside the file <em>common/user_specified_structures.h</em>. For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
+<pre><code>struct Vertex{ unsigned int distance; };
+struct Edge{ unsigned int weight; };    
 </code></pre>
     </p>
     <p>You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
 
     <p>The next step is to define required functions for CSR-based processing and CuSha. First I explain about CuSha functions, and then about CSR ones. 
-    Functions you need to modify to process your graph with CuSha are all inside <em>cusha-UserFunctions.cuh</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
+    Functions you need to modify to process your graph are all inside <em>user_specified_device_functions.cuh</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
     The first fucntion controllong the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
 <pre><code>inline __device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
@@ -89,12 +84,12 @@ typedef struct Edge{ unsigned int weight; }Edge;
 <P>
     In the next step, which happens in the function <b>compute_CuSha</b> every thread is assigned to process one edge. The operation done by the thread atomically updates the Vertex array in shared memory. 
     Below is <b>compute_CuSha</b> function for our SSSP. 
-<pre><code>inline __device__ void compute_CuSha(	Vertex* SrcV,	// Source vertex in global memory.
+<pre><code>inline __device__ void compute_CuSha(	Vertex SrcV,	// Source vertex.
 	Vertex_static* SrcV_static,	// Source Vertex_static in global memory. Dereferencing this pointer if it's not defined causes error.
 	Edge* E,	// Thread's specific shared memory.
-	Vertex* local_V	) {	// Current value of the corresponding destination vertex.
-		if (SrcV->distance != CUSHA_SSSP_INF)	// Just to prevent possible unpredicted overflows.
-			atomicMin ( &(local_V->distance), SrcV->distance + E->weight );
+	Vertex* local_V	) {	// Current value of the corresponding destination vertex in the shared memory.
+		if (SrcV.distance != CUSHA_SSSP_INF)	// Just to prevent possible unpredicted overflows.
+			atomicMin ( &(local_V->distance), SrcV.distance + E->weight );
 }
 </code></pre>
     One thing to note is that passed addresses must not be dereferenced if they are not already defined in structures.
@@ -110,12 +105,11 @@ typedef struct Edge{ unsigned int weight; }Edge;
 Please note returned value will consequently signal the host to launch new GPU kernels, so make sure your algorithm converges by <b>update_condition_CuSha</b> definition.
     </p>
     <p>
-    Beside above three functions there are two other user-specified functions in the same file that control initialization of the graph and how outputs should be.
-    <b>completeEntryCuSha</b> function is called during pre-processing for every edge and initalizes the edge content or source/destination vertex content appropriately. Examples can be found in templates.
-    <b>printVertexOutputCuSha</b> function is called after the processing has finished for every vertex to write the vertex content to the output file.
+    Beside above three functions there are two other user-specified functions in the file <em>user_specified_pre_and_post_processing_functions.hpp</em> that control initialization of the graph and how outputs should be.
+    <b>completeEntry</b> function is called during pre-processing for every edge and initalizes the edge content or source/destination vertex content appropriately. Examples can be found in templates.
+    <b>print_vertex_output</b> function is called after the processing has finished for every vertex to write the vertex content to the output file.
     </p>
-    <p> For CSR-based graph processing (using VWC or MTCPU methods), you need to modify the content of the file <em>csr-UserFunctions.cuh</em>. 
-    Most of the functions are similar to what I already explained except that computation function in the second step is now replaced with two other functions. 
+    <p> For CSR-based graph processing (using VWC or MTCPU methods), most of the functions are similar to what I already explained except that computation function in the second step is now replaced with two other functions. 
     One is <b>compute_local</b> in which a thread calculates and nominates a new value for the vertex. Then in <b>compute_reduce</b> function, contents are compared two-by-two. 
     This reduction happens for all the neighbors of a vertex, and the last selected nominee will be sent for update verification in <b>update_condition</b> function.
     </p>
