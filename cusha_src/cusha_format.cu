@@ -38,7 +38,7 @@ void cusha_format::process(
 			CUDAErrorCheck( cudaDeviceSetSharedMemConfig( cudaSharedMemBankSizeEightByte ) );
 	#endif
 
-	// Estimate the proper block size.worms
+	// Estimate the proper block size.
 	const blockSize_N_pair bsizeNPair = find_proper_block_size( bsize, nEdges, nVerticesInitially );
 	const uint nShards = std::ceil( (double)nVerticesInitially / bsizeNPair.N );
 	const uint nVertices = nShards * bsizeNPair.N;
