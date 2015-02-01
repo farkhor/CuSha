@@ -1,0 +1,1 @@
+nvcc entry_point.cu common/simpleTime.cu csr_src/csr_format.cu csr_src/vwc_process.cu csr_src/mtcpu_process.cu cusha_src/cusha_format.cu cusha_src/cusha_process.cu cusha_src/find_block_size.cu common/parse_graph.cpp -arch=sm_35 -o cusha
