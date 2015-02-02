@@ -64,8 +64,8 @@ void cusha_format::process(
 			tmpShardEntry.dstIdx = vIdx;
 			tmpShardEntry.srcIdx = nbr.srcIndex;
 			if( sizeof(Edge) > 1 ) tmpShardEntry.edgeVal = nbr.edgeValue;
-			uint belongingShardIdx = ( tmpShardEntry.dstIdx * nShards ) / nVertices;
-			uint belongingWindowIdx = ( tmpShardEntry.srcIdx * nShards ) / nVertices;
+			uint belongingShardIdx = ( static_cast<unsigned long long>( tmpShardEntry.dstIdx ) * nShards ) / nVertices;
+			uint belongingWindowIdx = ( static_cast<unsigned long long>( tmpShardEntry.srcIdx ) * nShards ) / nVertices;
 			graphShards.at( belongingShardIdx ).at( belongingWindowIdx ).push_back( tmpShardEntry );
 		}
 	}
