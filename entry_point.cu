@@ -29,13 +29,12 @@ int main( int argc, char** argv )
 	std::string usage =
 		"\tRequired command line arguments:\n\
 			-Input file: E.g., --input in.txt\n\
-			-Processing method: CW, GS, VWC, MTCPU. E.g., --method CW\n\
+			-Processing method: CW, GS, VWC. E.g., --method CW\n\
 		Additional arguments:\n\
 			-Output file (default: out.txt). E.g., --output myout.txt.\n\
 			-Device ID (default: 0). E.g., --device 1\n\
 			-GPU kernels Block size for CW and GS (default: chosen based on analysis). E.g., --bsize 512.\n\
 			-Virtual warp size for VWC (default: 32). E.g., --vwsize 8.\n\
-			-Number of threads for MTCPU (default: 1). E.g., --threads 4.\n\
 			-User's arbitrary parameter (default: 0). E.g., --arbparam 17.\n";
 
 	try {
@@ -61,8 +60,6 @@ int main( int argc, char** argv )
 					procesingMethod = GS;
 				if ( !strcmp(argv[iii+1], "VWC") )
 					procesingMethod = VWC;
-				if ( !strcmp(argv[iii+1], "MTCPU") )
-					procesingMethod = MTCPU;
 			}
 			else if( !strcmp( argv[iii], "--input" ) && iii != argc-1 /*is not the last one*/)
 				openFileToAccess< std::ifstream >( inputFile, std::string( argv[iii+1] ) );
@@ -74,8 +71,6 @@ int main( int argc, char** argv )
 				bsize = std::atoi( argv[iii+1] );
 			else if( !strcmp( argv[iii], "--vwsize" ) && iii != argc-1 /*is not the last one*/)
 				vwsize = std::atoi( argv[iii+1] );
-			else if( !strcmp( argv[iii], "--threads" ) && iii != argc-1 /*is not the last one*/)
-				threads = std::atoi( argv[iii+1] );
 			else if( !strcmp( argv[iii], "--arbparam" ) && iii != argc-1 /*is not the last one*/)
 				arbparam = std::atoll( argv[iii+1] );
 
@@ -85,17 +80,13 @@ int main( int argc, char** argv )
 		}
 		if( !outputFile.is_open() )
 			openFileToAccess< std::ofstream >( outputFile, "out.txt" );
-		if( procesingMethod != MTCPU ) {
-			CUDAErrorCheck( cudaSetDevice( selectedDevice ) );
-			std::cout << "Device with ID " << selectedDevice << " is selected to process the graph.\n";
-			if( procesingMethod == VWC ) {
-				if( vwsize != 2 && vwsize !=4 && vwsize != 8 && vwsize != 16 && vwsize != 32 )
-					vwsize = 32;
-				std::cout << "Virtual-Warp Centric method will be employed to process the graph with virtual warp size " << vwsize << ".\n";
-			}
+		CUDAErrorCheck( cudaSetDevice( selectedDevice ) );
+		std::cout << "Device with ID " << selectedDevice << " is selected to process the graph.\n";
+		if( procesingMethod == VWC ) {
+			if( vwsize != 2 && vwsize !=4 && vwsize != 8 && vwsize != 16 && vwsize != 32 )
+				vwsize = 32;
+			std::cout << "Virtual-Warp Centric method will be employed to process the graph with virtual warp size " << vwsize << ".\n";
 		}
-		else
-			std::cout << "CPU will process the graph with " << ( threads = ( (threads<1) ? 1 : threads ) ) << " threads.\n";
 
 
 		/********************************
@@ -125,7 +116,6 @@ int main( int argc, char** argv )
 		}
 		else {
 			csr_format::process(
-					procesingMethod,
 					((procesingMethod==VWC)?vwsize:threads),
 					&parsedGraph,
 					nEdges,
@@ -137,8 +127,7 @@ int main( int argc, char** argv )
 		 * It's done here.
 		 ********************************/
 
-		if( procesingMethod != MTCPU )
-			CUDAErrorCheck( cudaDeviceReset() );
+		CUDAErrorCheck( cudaDeviceReset() );
 		std::cout << "Done.\n";
 		return( EXIT_SUCCESS );
 

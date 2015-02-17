@@ -10,7 +10,6 @@
 
 namespace csr_format{
 	void process(
-			const GraphProcessingMethod procesingMethod,
 			const int vwsize_or_threads,
 			std::vector<initial_vertex>* initGraph,
 			const uint nEdges,
