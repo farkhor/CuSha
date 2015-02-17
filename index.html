@@ -34,7 +34,7 @@
       <p>
         CuSha is a CUDA-based vertex-centric graph processing framework that uses G-Shards and Concatenated Windows (CW) representations to store graphs inside the GPU global memory. 
         G-Shards and CW consume more space compared to Compressed Sparse Row (CSR) format but on the other hand provide better performance due to GPU-friednly representations. 
-        For completeness, provided package also includes Virtual Warp-Centric (VWC) processing method for GPU and a multi-threaded CPU implementation, both using CSR representation. CPU implementation utilizes Pthreads.
+        For completeness, provided package also includes Virtual Warp-Centric (VWC) processing method for GPU that uses CSR representation.
       </p>
       <p>
       	You can download the paper about CuSha from <a href="http://www.cs.ucr.edu/~fkhor001/projects.html#cusha">here</a>. You can also download the slides I prepared for this paper from <a href="http://www.cs.ucr.edu/~fkhor001/CuSha/CuSha_Slides.pptx">here</a>. You'll need MS PowerPoint '07 or higher for a proper presentation.
@@ -60,7 +60,7 @@
        </p>
      <h4>Algorithm Definition</h4>
      <p>
-       First of all, <b>Please note algorithm definition steps for CSR based graph processing (VWC and Multi-threaded CPU) are a bit different but completely independant from CuSha representations.</b> 
+       First of all, <b>Please note algorithm definition steps for CSR based graph processing (VWC) are a bit different but completely independant from CuSha representations.</b> 
        It means if you are defining your algorithm for CSR-based processing, processing procedure with CuSha representations stay unchanged (and also vice versa). 
        </p>
        <p>
@@ -71,7 +71,7 @@ struct Edge{ unsigned int weight; };
     </p>
     <p>You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
 
-    <p>The next step is to define required functions for CSR-based processing and CuSha. First I explain about CuSha functions, and then about CSR ones. 
+    <p>The next step is to define required functions for CSR-based processing and CuSha. First I explain about CuSha functions, and then about CSR one. 
     Functions you need to modify to process your graph are all inside <em>user_specified_device_functions.cuh</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
     The first fucntion controllong the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
@@ -109,7 +109,7 @@ Please note returned value will consequently signal the host to launch new GPU k
     <b>completeEntry</b> function is called during pre-processing for every edge and initalizes the edge content or source/destination vertex content appropriately. Examples can be found in templates.
     <b>print_vertex_output</b> function is called after the processing has finished for every vertex to write the vertex content to the output file.
     </p>
-    <p> For CSR-based graph processing (using VWC or MTCPU methods), most of the functions are similar to what I already explained except that computation function in the second step is now replaced with two other functions. 
+    <p> For CSR-based graph processing (using VWC), most of the functions are similar to what I already explained except that computation function in the second step is now replaced with two other functions. 
     One is <b>compute_local</b> in which a thread calculates and nominates a new value for the vertex. Then in <b>compute_reduce</b> function, contents are compared two-by-two. 
     This reduction happens for all the neighbors of a vertex, and the last selected nominee will be sent for update verification in <b>update_condition</b> function.
     </p>
