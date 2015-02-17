@@ -50,7 +50,7 @@ void cusha_format::process(
 	host_pinned_buffer<Vertex> vertexValue( nVertices );
 	std::vector<Vertex_static> tmpVertexValueStatic;
 	if( sizeof(Vertex_static) > 1 ) tmpVertexValueStatic.resize( nVertices );
-	std::vector< std::vector< std::vector<shard_entry> > > graphShards( nShards, std::vector< std::vector<shard_entry> >(nShards) );
+	std::vector< std::vector<shard_entry> > graphWindows( nShards * nShards, std::vector<shard_entry>( 0 ) );
 
 	// Collecting graph data into shard form.
 	for( uint vIdx = 0; vIdx < nVerticesInitially; ++vIdx ) {
@@ -66,7 +66,7 @@ void cusha_format::process(
 			if( sizeof(Edge) > 1 ) tmpShardEntry.edgeVal = nbr.edgeValue;
 			uint belongingShardIdx = ( static_cast<unsigned long long>( tmpShardEntry.dstIdx ) * nShards ) / nVertices;
 			uint belongingWindowIdx = ( static_cast<unsigned long long>( tmpShardEntry.srcIdx ) * nShards ) / nVertices;
-			graphShards.at( belongingShardIdx ).at( belongingWindowIdx ).push_back( tmpShardEntry );
+			graphWindows.at( belongingShardIdx * nShards + belongingWindowIdx ).push_back( tmpShardEntry );
 		}
 	}
 	initGraph->clear();
@@ -94,7 +94,7 @@ void cusha_format::process(
 	uint winMovingIdx = 0;
 	for( uint shardIdx = 0; shardIdx < nShards; ++shardIdx ) {
 		for( uint winIdx = 0; winIdx < nShards; ++winIdx ) {
-			std::vector<shard_entry>& window = graphShards.at( shardIdx ).at( winIdx );
+			std::vector<shard_entry>& window = graphWindows.at( shardIdx * nShards + winIdx );
 			for( uint entryIdx = 0; entryIdx < window.size(); ++entryIdx ) {
 				SrcValue[ movingIdx ] = vertexValue[ window.at( entryIdx ).srcIdx ];
 				DstIndex[ movingIdx ] = window.at( entryIdx ).dstIdx;
@@ -112,7 +112,7 @@ void cusha_format::process(
 	movingIdx = 0;
 	for( uint winIdx = 0; winIdx < nShards; ++winIdx ) {
 		for( uint shardIdx = 0; shardIdx < nShards; ++shardIdx ) {
-			std::vector<shard_entry>& window = graphShards.at( shardIdx ).at( winIdx );
+			std::vector<shard_entry>& window = graphWindows.at( shardIdx * nShards + winIdx );
 			uint inWinMovingIdx = 0;
 			for( uint entryIdx = 0; entryIdx < window.size(); ++entryIdx ) {
 				if( procesingMethod == CW ) {
@@ -125,7 +125,7 @@ void cusha_format::process(
 		}
 		concatenatedWindowsSizesScan[ winIdx + 1 ] = movingIdx;
 	}
-	graphShards.clear();
+	graphWindows.clear();
 
 	// Define and allocate device buffers.
 	device_buffer<Vertex> dev_vertexValue( nVertices );
