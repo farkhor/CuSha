@@ -150,6 +150,9 @@ Please note returned value will consequently signal the host to launch new GPU k
     	CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, Maxwell architecture provides native shared memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
     	</li>
     	<li>
+    	In the presented code, the updates to the shards' source vertex value entries may be executed concurrently with the reads of it from another block. While this overlap can be unsafe for the reader threads, we have not experienced any corrupted reads using GeForce GTX 780. This might be due to a feature in the device memory controller (unknown to us) and/or the small size of the Vertex structure. If you would like not to rely on this undocumented property, or the part of your Vertex structure that changes after every iteration is bigger than four bytes, you may want to typedef the vertices to integers or floating point numbers and update the source values of shard entries using atomic exchange operation. Similarly, reading of vertex values in VWC can be simultaneous with the vertex modifications thus you would have to do the same thing for VWC as well.
+    	</li>
+    	<li>
     	We have not taken into account memory allocations in time measurements for CPU and GPU copying/processing methods.
     	</li>
     </ul></p>
