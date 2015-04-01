@@ -32,6 +32,7 @@ int main( int argc, char** argv )
 			-Processing method: CW, GS, VWC. E.g., --method CW\n\
 		Additional arguments:\n\
 			-Output file (default: out.txt). E.g., --output myout.txt.\n\
+			-Is the input graph directed (default:yes). To make it undirected: --undirected\n\
 			-Device ID (default: 0). E.g., --device 1\n\
 			-GPU kernels Block size for CW and GS (default: chosen based on analysis). E.g., --bsize 512.\n\
 			-Virtual warp size for VWC (default: 32). E.g., --vwsize 8.\n\
@@ -47,6 +48,7 @@ int main( int argc, char** argv )
 		int vwsize = 32;
 		int threads = 1;
 		long long arbparam = 0;
+		bool nonDirectedGraph = false;		// By default, the graph is directed.
 
 		/********************************
 		 * GETTING INPUT PARAMETERS.
@@ -73,6 +75,8 @@ int main( int argc, char** argv )
 				vwsize = std::atoi( argv[iii+1] );
 			else if( !strcmp( argv[iii], "--arbparam" ) && iii != argc-1 /*is not the last one*/)
 				arbparam = std::atoll( argv[iii+1] );
+			else if( !strcmp(argv[iii], "--undirected"))
+				nonDirectedGraph = true;
 
 		if( !inputFile.is_open() || procesingMethod == UNSPECIFIED ) {
 			std::cerr << "Usage: " << usage;
@@ -98,7 +102,8 @@ int main( int argc, char** argv )
 		uint nEdges = parse_graph::parse(
 				inputFile,		// Input file.
 				parsedGraph,	// The parsed graph.
-				arbparam );		// Arbitrary user-provided parameter.
+				arbparam,
+				nonDirectedGraph );		// Arbitrary user-provided parameter.
 		std::cout << "Input graph collected with " << parsedGraph.size() << " vertices and " << nEdges << " edges.\n";
 
 
