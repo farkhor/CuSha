@@ -10,7 +10,8 @@
 uint parse_graph::parse(
 		std::ifstream& inFile,
 		std::vector<initial_vertex>& initGraph,
-		const long long arbparam ) {
+		const long long arbparam,
+		const bool nondirected ) {
 
 	const bool firstColumnSourceIndex = true;
 
@@ -46,17 +47,17 @@ uint parse_graph::parse(
 		uint dstVertexIndex = firstColumnSourceIndex ? secondIndex : firstIndex;
 		if( initGraph.size() <= theMax )
 			initGraph.resize(theMax+1);
+		{
+			neighbor nbrToAdd;
+			nbrToAdd.srcIndex = srcVertexIndex;
 
-		neighbor nbrToAdd;
-		nbrToAdd.srcIndex = srcVertexIndex;
-
-		Additionalargc=0;
-		Additionalargv[ Additionalargc ] = strtok( NULL, delim );
-		while( Additionalargv[ Additionalargc ] != NULL ){
-			Additionalargc++;
+			Additionalargc=0;
 			Additionalargv[ Additionalargc ] = strtok( NULL, delim );
-		}
-		completeEntry(	Additionalargc,
+			while( Additionalargv[ Additionalargc ] != NULL ){
+				Additionalargc++;
+				Additionalargv[ Additionalargc ] = strtok( NULL, delim );
+			}
+			completeEntry(	Additionalargc,
 						Additionalargv,
 						srcVertexIndex,
 						dstVertexIndex,
@@ -67,8 +68,38 @@ uint parse_graph::parse(
 						&(initGraph.at(dstVertexIndex).VertexValueStatic),
 						arbparam );
 
-		initGraph.at(dstVertexIndex).nbrs.push_back( nbrToAdd );
-		nEdges++;
+			initGraph.at(dstVertexIndex).nbrs.push_back( nbrToAdd );
+			nEdges++;
+		}
+		if( nondirected ) {
+			
+			uint tmp = srcVertexIndex;
+			srcVertexIndex = dstVertexIndex;
+			dstVertexIndex = tmp;
+			
+			neighbor nbrToAdd;
+			nbrToAdd.srcIndex = srcVertexIndex;
+
+			Additionalargc=0;
+			Additionalargv[ Additionalargc ] = strtok( NULL, delim );
+			while( Additionalargv[ Additionalargc ] != NULL ){
+				Additionalargc++;
+				Additionalargv[ Additionalargc ] = strtok( NULL, delim );
+			}
+			completeEntry(	Additionalargc,
+						Additionalargv,
+						srcVertexIndex,
+						dstVertexIndex,
+						&(nbrToAdd.edgeValue),
+						(initGraph.at(srcVertexIndex).vertexValue),
+						&(initGraph.at(srcVertexIndex).VertexValueStatic),
+						(initGraph.at(dstVertexIndex).vertexValue),
+						&(initGraph.at(dstVertexIndex).VertexValueStatic),
+						arbparam );
+
+			initGraph.at(dstVertexIndex).nbrs.push_back( nbrToAdd );
+			nEdges++;
+		}
 	}
 
 	return nEdges;
