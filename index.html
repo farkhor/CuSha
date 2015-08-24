@@ -63,20 +63,20 @@
        It means if you are defining your algorithm for CSR-based processing, processing procedure with CuSha representations stay unchanged (and also vice versa). 
        </p>
        <p>
-       To use CuSha, before defining required functions, you need to first specify vertex content and edge content for the graph inside the file <em>common/user_specified_structures.h</em>. For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> structures are defined like below:
-<pre><code>struct Vertex{ unsigned int distance; };
+       To use CuSha, before defining required functions, you need to first specify vertex content and edge content for the graph inside the file <em>common/user_specified_structures.h</em>. For example, for SSSP algorithm, <em>Vertex</em> and <em>Edge</em> are defined like below:
+<pre><code>typedef unsigned int Vertex;
 struct Edge{ unsigned int weight; };    
 </code></pre>
     </p>
-    <p>You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
+    <p>Please note that typedef for Vertex has to be one of the types for which there exist atomic exchange operations. You can also fill up <em>Vertex_static</em> structure when there are vertex properties remaining intact during graph processing.</p>
 
     <p>The next step is to define required functions for CSR-based processing and CuSha. First I explain about CuSha functions, and then about CSR one. 
     Functions you need to modify to process your graph are all inside <em>user_specified_device_functions.cuh</em>. Processing with CuSha happens in 4 step from which 3 are explicitly and directly determined by the user. 
     The first fucntion controllong the first step is <b>init_compute_CuSha</b> that initializes vertex array in shared memory. This shared memory vertex array is used as an scratchpad (just like what they say about GPU shared memory) to perform computation on vertices. 
     The role of <b>init_compute_CuSha</b> function is to properly make shared memory ready for the current iteration. As an example, for our SSSP, the function is:
-<pre><code>inline __device__ void init_compute_CuSha(	Vertex* local_V,	// Address of the corresponding vertex in shared memory.
-	Vertex* V	) {	// Address of the vertex in global memory
-		local_V->distance = V->distance;
+<pre><code>inline __device__ void init_compute_CuSha(	Vertex& local_V,	// Address of the corresponding vertex in shared memory.
+	Vertex& V	) {	// Address of the vertex in global memory
+		local_V= V;
 }
 </code></pre>
 </P>
@@ -88,7 +88,7 @@ struct Edge{ unsigned int weight; };
 	Edge* E,	// Connected Edge value. Dereferencing this pointer if it's not defined causes error.
 	Vertex* local_V	) {	// Current value of the corresponding destination vertex in the shared memory.
 		if (SrcV.distance != CUSHA_SSSP_INF)	// Just to prevent possible unpredicted overflows.
-			atomicMin ( &(local_V->distance), SrcV.distance + E->weight );
+			atomicMin( local_V, SrcV + E->weight );
 }
 </code></pre>
     One thing to note is that passed addresses must not be dereferenced if they are not already defined in structures.
@@ -96,9 +96,9 @@ struct Edge{ unsigned int weight; };
     <p>
     The third step is to signal the caller function if the newly calculated vertex value is eligible to update the previosu value.
     <b>update_condition_CuSha</b> function does it by returning a boolean. This function for SSSP can be defined like below:
-<pre><code>inline __device__ bool update_condition_CuSha(	Vertex* local_V,	// newly calculated vertex content.
-	Vertex* V	) {	// Vertex content at the end of previous iteration.
-		return ( local_V->distance < V->distance );
+<pre><code>inline __device__ bool update_condition_CuSha(	Vertex& local_V,	// newly calculated vertex content.
+	Vertex& V	) {	// Vertex content at the end of previous iteration.
+		return ( local_V < V );
 }
 </code></pre>
 Please note returned value will consequently signal the host to launch new GPU kernels, so make sure your algorithm converges by <b>update_condition_CuSha</b> definition.
@@ -114,11 +114,11 @@ Please note returned value will consequently signal the host to launch new GPU k
     </p>
     <h4>Compile and Link</h4>
     <p>
-      I have provided a very straight forward build bash script named <em>sfBuild.sh</em> that compiles files with required flags and links them and outputs the executable.
-      Specified architecture (compute capability) in <em>sfBuild.sh</em> is 3.5. You will have to modify it according to your target device.
+      I have provided a very straight-forward build bash script named <em>sfBuild.sh</em> that compiles files with required flags and links them and outputs the executable.
+      Specified architecture (compute capability) in <em>sfBuild.sh</em> is 3.5. You will have to modify it according to your target device. Straight-forward build file does compilation for all the files every time you run it. I have also provided the Release make avaliable in the "Release" folder.
     </p>
     <p>
-    Provided build file does compilation for all the files every time you run it. 
+     
     If you are interested to play with the code, it is definitely better to use <b>Nsight Eclipse Edition</b> provided in Nvidia toolkit for non-windows operating systems. 
     In order to do so, create an empty CUDA C/C++ project (with specified sm architecture and separate compilation) in Nsight. 
     Then right click on the project on <em>Project Explorer</em>, select <em>import</em>-><em>General</em>-><em>File System</em>. 
@@ -147,9 +147,6 @@ Please note returned value will consequently signal the host to launch new GPU k
     <p><ul>
     	<li>
     	CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, Maxwell architecture provides native shared memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
-    	</li>
-    	<li>
-    	In the presented code, the updates to the shards' source vertex value entries may be executed concurrently with the read of it from another block. While this overlap can be unsafe for the reader threads, we have not experienced any corrupted reads using GeForce GTX 780. This might be due to a feature in the device memory controller (unknown to us) and/or the small size of the Vertex structure. If you would like not to rely on this undocumented property, or the part of your Vertex structure that changes after every iteration is bigger than four bytes, you may want to typedef the vertices to integers or floating point numbers and update the source values of shard entries using atomic exchange operation. Similarly, reading of vertex values in VWC can be simultaneous with the vertex modifications thus you would have to do the same thing for VWC as well.
     	</li>
     	<li>
     	We have not taken into account memory allocations in time measurements for CPU and GPU copying/processing methods.
