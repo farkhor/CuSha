@@ -149,7 +149,7 @@ Please note returned value will consequently signal the host to launch new GPU k
     	CuSha heavily relies on atomic operations on shared memory. As explained by <em>Mark Harris</em> in <a href="https://devblogs.nvidia.com/parallelforall/5-things-you-should-know-about-new-maxwell-gpu-architecture/">this post</a>, Maxwell architecture provides native shared memory atomics which will defintiely make CuSha much faster. Maxwell also has bigger shared memory capacity per SM that will make it possible to have bigger shards and windows in CuSha, hence accelerating the whole procedure.
     	</li>
     	<li>
-    	In the presented code, the updates to the shards' source vertex value entries may be executed concurrently with the read of it from another block. While these concurrent reads and writes are non-atomic, since the size of the vertex values are small (32-bit for the vertex modifiable part, for all experiments), the values do not become corrupted. For larger vertex sizes (64-bit), make sure you align the vertex structure properly. 
+    	In the presented code, the updates to the shards' source vertex value entries may be executed concurrently with the read of it from another block. While these concurrent reads and writes are non-atomic, since the size of the vertex values are small (32-bit for the vertex's modifiable part, for all experiments), the values do not become corrupted. For larger vertex sizes (64-bit), make sure you align the vertex structure properly. 
     	</li>
     	<li>
     	We have not taken into account memory allocations in time measurements for CPU and GPU copying/processing methods.
