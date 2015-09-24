@@ -17,30 +17,31 @@
 inline void completeEntry(
 		unsigned int argcount,	// The number of additional items in the line
 		char** argvector,	// char* pointer for which dereferencing its elements provides us with the additional items in the line in form of char*.
-		const int src_vertex,	// Source vertex index.
-		const int dst_vertex,	// Destination vertex index.
+		const int src_vertex_index,	// Source vertex index.
+		const int dst_vertex_index,	// Destination vertex index.
 		Edge* edge_address,	// Pointer to the current edge corresponding to the current line.
-		Vertex& src_vertex_address,	// Pointer to the source vertex.
+		Vertex& src_vertex_ref,	// Pointer to the source vertex.
 		Vertex_static* src_vertex_static_address,	// Pointer to the source Vertex_static.
-		Vertex& dst_vertex_address,  // Pointer to the destination vertex.
+		Vertex& dst_vertex_ref,  // Pointer to the destination vertex.
 		Vertex_static* dst_vertex_static_address,	// Pointer to the destination Vertex_static.
-		const long long arbparam = 0	) {	// Arbitrary integer input in the console.
+		const long long arbparam = 0	// Arbitrary integer input in the console.
+		) {
 
 #ifdef BFS
-	src_vertex_address.distance = ( src_vertex != arbparam ) ? BFS_INF : 0;
-	dst_vertex_address.distance = ( dst_vertex != arbparam ) ? BFS_INF : 0;
+	src_vertex_ref.distance = ( src_vertex_index != arbparam ) ? BFS_INF : 0;
+	dst_vertex_ref.distance = ( dst_vertex_index != arbparam ) ? BFS_INF : 0;
 #endif
 
 #ifdef SSSP
-	src_vertex_address.distance = ( src_vertex != arbparam ) ? SSSP_INF : 0;
-	dst_vertex_address.distance = ( dst_vertex != arbparam ) ? SSSP_INF : 0;
+	src_vertex_ref.distance = ( src_vertex_index != arbparam ) ? SSSP_INF : 0;
+	dst_vertex_ref.distance = ( dst_vertex_index != arbparam ) ? SSSP_INF : 0;
 	edge_address->weight = ( argcount > 0 ) ? atoi(argvector[0]) : 0;
 #endif
 
 #ifdef PR
-	src_vertex_address.rank = PR_INITIAL_VALUE;
-	dst_vertex_address.rank = PR_INITIAL_VALUE;
-	src_vertex_static_address->NbrsNum = ( argcount > 0 ) ? atoi(argvector[0]) : 0;
+	src_vertex_ref.rank = PR_INITIAL_VALUE;
+	dst_vertex_ref.rank = PR_INITIAL_VALUE;
+	src_vertex_static_address->NbrsNum = ( argcount > 0 ) ? atoi( argvector[0] ) : 0;
 #endif
 
 }
@@ -55,7 +56,8 @@ inline void completeEntry(
 inline void print_vertex_output(
 		const uint vertexIndex,
 		const Vertex resultVertex,
-		std::ofstream& outFile	) {
+		std::ofstream& outFile
+		) {
 
 #ifdef BFS
 	outFile << vertexIndex << ":\t" << resultVertex.distance << "\n";
